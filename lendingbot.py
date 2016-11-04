@@ -288,7 +288,7 @@ def create_loan_offer(currency, amt, rate):
             if days > days_remaining:
                 days = days_remaining
             if days < '2':
-                print "The day of ending is upon us. (endDate reached)\nNow exiting..."
+                print "endDate reached. Bot can no longer lend.\nExiting..."
                 log.log("endDate reached. Bot can no longer lend. Exiting.")
                 exit(0)
         if not dry_run:
