@@ -348,18 +348,29 @@ def amount_to_lent(active_cur_test_balance, active_cur, lending_balance, low_rat
     return active_bal
 
 
-def cancel_and_loan_all():
+def get_open_offers():
     loan_offers = bot.returnOpenLoanOffers()
-    if type(loan_offers) is list:  # silly api wrapper, empty dict returns a list, which brakes the code later.
+    if type(loan_offers) is list:  # silly api wrapper, empty dict returns a list, which breaks the code later.
         loan_offers = {}
+    return loan_offers
 
+
+def get_on_order_balances():
+    loan_offers = get_open_offers()
     on_order_balances = {}
+    for CUR in loan_offers:
+        for offer in loan_offers[CUR]:
+            on_order_balances[CUR] = on_order_balances.get(CUR, 0) + Decimal(offer['amount'])
+    return on_order_balances
+
+
+def cancel_all():
+    loan_offers = get_open_offers()
     for CUR in loan_offers:
         if CUR in coincfg and coincfg[CUR]['maxactive'] == 0:
             # don't cancel disabled coin
             continue
         for offer in loan_offers[CUR]:
-            on_order_balances[CUR] = on_order_balances.get(CUR, 0) + Decimal(offer['amount'])
             if not dry_run:
                 try:
                     msg = bot.cancelLoanOffer(CUR, offer['id'])
@@ -367,11 +378,13 @@ def cancel_and_loan_all():
                 except Exception as E:
                     log.log("Error canceling loan offer: " + str(E))
 
+
+def loan_all():
     lending_balances = bot.returnAvailableAccountBalances("lending")['lending']
     if dry_run:  # just fake some numbers, if dryrun (testing)
-        if type(lending_balances) is list:  # silly api wrapper, empty dict returns a list, which brakes the code later.
+        if type(lending_balances) is list:  # silly api wrapper, empty dict returns a list, which breaks the code later.
             lending_balances = {}
-        lending_balances.update(on_order_balances)
+        lending_balances.update(get_on_order_balances())
 
     # Fill the (maxToLend) balances on the botlog.json for display it on the web
     for key in sorted(totalLended):
@@ -607,7 +620,8 @@ try:
             refresh_total_lended()
             update_conversion_rates()
             transfer_balances()
-            cancel_and_loan_all()
+            cancel_all()
+            loan_all()
             log.refreshStatus(stringify_total_lended())
             log.persistStatus()
             sys.stdout.flush()
