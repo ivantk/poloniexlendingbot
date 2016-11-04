@@ -275,6 +275,7 @@ def stringify_total_lended():
 
 def create_loan_offer(currency, amt, rate):
     days = '2'
+    days_remaining = get_max_duration()
     # if (min_daily_rate - 0.000001) < rate and Decimal(amt) > min_loan_size:
     if float(amt) > min_loan_size:
         rate = float(rate) - 0.000001  # lend offer just bellow the competing one
@@ -283,9 +284,16 @@ def create_loan_offer(currency, amt, rate):
             days = xdays
         if xday_threshold == 0:
             days = '2'
+        if config.has_option('BOT', 'endDate'):
+            if days > days_remaining:
+                days = days_remaining
+            if days < '2':
+                print "The day of ending is upon us. (endDate reached)\nNow exiting..."
+                sys.exit(0)
         if not dry_run:
             msg = bot.createLoanOffer(currency, amt, days, 0, rate)
             log.offer(amt, currency, rate, days, msg)
+
 
 # limit of orders to request
 loanOrdersRequestLimit = {}
@@ -370,7 +378,7 @@ def get_max_duration():
         config_date = map(int, config.get('BOT', 'endDate').split(','))
         end_time = datetime.date(*config_date)  # format YEAR,MONTH,DAY all ints, also used splat operator
         diff_days = end_time - now_time
-        return diff_days.days
+        return str(diff_days.days)
     except Exception as E:
         print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
 
