@@ -275,7 +275,6 @@ def stringify_total_lended():
 
 def create_loan_offer(currency, amt, rate):
     days = '2'
-    days_remaining = get_max_duration()
     # if (min_daily_rate - 0.000001) < rate and Decimal(amt) > min_loan_size:
     if float(amt) > min_loan_size:
         rate = float(rate) - 0.000001  # lend offer just bellow the competing one
@@ -285,6 +284,7 @@ def create_loan_offer(currency, amt, rate):
         if xday_threshold == 0:
             days = '2'
         if config.has_option('BOT', 'endDate'):
+            days_remaining = get_max_duration()
             if days > days_remaining:
                 days = days_remaining
             if days < '2':
