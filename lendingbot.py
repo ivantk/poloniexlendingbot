@@ -364,6 +364,17 @@ def get_on_order_balances():
     return on_order_balances
 
 
+def get_max_duration():
+    try:
+        now_time = datetime.date.today()
+        config_date = map(int, config.get('BOT', 'endDate').split(','))
+        end_time = datetime.date(*config_date)  # format YEAR,MONTH,DAY all ints, also used splat operator
+        diff_days = end_time - now_time
+        return diff_days.days
+    except Exception as E:
+        print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
+
+
 def cancel_all():
     loan_offers = get_open_offers()
     for CUR in loan_offers:
