@@ -374,12 +374,14 @@ def get_on_order_balances():
 
 
 def get_max_duration():
+    if not config.get('BOT', 'endDate'):
+        return "Not Set"
     try:
         now_time = datetime.date.today()
         config_date = map(int, config.get('BOT', 'endDate').split(','))
         end_time = datetime.date(*config_date)  # format YEAR,MONTH,DAY all ints, also used splat operator
-        diff_days = end_time - now_time
-        return str(diff_days.days)
+        diff_days = (end_time - now_time).days
+        return str(diff_days)
     except Exception as E:
         print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
 
@@ -642,7 +644,7 @@ try:
             transfer_balances()
             cancel_all()
             loan_all()
-            log.refreshStatus(stringify_total_lended())
+            log.refreshStatus(stringify_total_lended(), get_max_duration())
             log.persistStatus()
             sys.stdout.flush()
             time.sleep(sleep_time)
