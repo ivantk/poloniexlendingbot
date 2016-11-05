@@ -284,7 +284,7 @@ def create_loan_offer(currency, amt, rate):
         if xday_threshold == 0:
             days = '2'
         if config.has_option('BOT', 'endDate'):
-            days_remaining = get_max_duration()
+            days_remaining = get_max_duration("order")
             if days > days_remaining:
                 days = days_remaining
             if days < '2':
@@ -373,17 +373,20 @@ def get_on_order_balances():
     return on_order_balances
 
 
-def get_max_duration():
+def get_max_duration(context):
     if not config.get('BOT', 'endDate'):
-        return "Not Set"
+        return ""
     try:
         now_time = datetime.date.today()
         config_date = map(int, config.get('BOT', 'endDate').split(','))
         end_time = datetime.date(*config_date)  # format YEAR,MONTH,DAY all ints, also used splat operator
         diff_days = (end_time - now_time).days
-        return str(diff_days)
     except Exception as E:
         print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
+    if context == "order":
+        return diff_days
+    if context == "status":
+        return " - Days Remaining: " + diff_days
 
 
 def cancel_all():
@@ -644,7 +647,7 @@ try:
             transfer_balances()
             cancel_all()
             loan_all()
-            log.refreshStatus(stringify_total_lended(), get_max_duration())
+            log.refreshStatus(stringify_total_lended(), get_max_duration("status"))
             log.persistStatus()
             sys.stdout.flush()
             time.sleep(sleep_time)

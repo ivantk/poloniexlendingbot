@@ -46,8 +46,8 @@ class JsonOutput(object):
         self.clearStatusValues()
         self.jsonOutputLog = RingBuffer(logLimit)
 
-    def status(self, status, time, days_remaining):
-        self.jsonOutput["last_update"] = time + " - Days Remaining: " + days_remaining
+    def status(self, status, time, days_remaining_msg):
+        self.jsonOutput["last_update"] = time + days_remaining_msg
         self.jsonOutput["last_status"] = status
 
     def printline(self, line):
