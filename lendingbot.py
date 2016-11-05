@@ -285,12 +285,12 @@ def create_loan_offer(currency, amt, rate):
             days = '2'
         if config.has_option('BOT', 'endDate'):
             days_remaining = get_max_duration("order")
-            if days > days_remaining:
-                days = days_remaining
-            if days < '2':
+            if days_remaining <= "2":
                 print "endDate reached. Bot can no longer lend.\nExiting..."
                 log.log("endDate reached. Bot can no longer lend. Exiting.")
                 exit(0)
+            if days > days_remaining:
+                days = days_remaining
         if not dry_run:
             msg = bot.createLoanOffer(currency, amt, days, 0, rate)
             log.offer(amt, currency, rate, days, msg)
