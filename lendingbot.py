@@ -359,7 +359,7 @@ def amount_to_lent(active_cur_test_balance, active_cur, lending_balance, low_rat
 
 def get_open_offers():
     loan_offers = bot.returnOpenLoanOffers()
-    if type(loan_offers) is list:  # silly api wrapper, empty dict returns a list, which breaks the code later.
+    if isinstance(loan_offers, list):  # silly api wrapper, empty dict returns a list, which breaks the code later.
         loan_offers = {}
     return loan_offers
 
@@ -407,7 +407,7 @@ def cancel_all():
 def loan_all():
     lending_balances = bot.returnAvailableAccountBalances("lending")['lending']
     if dry_run:  # just fake some numbers, if dryrun (testing)
-        if type(lending_balances) is list:  # silly api wrapper, empty dict returns a list, which breaks the code later.
+        if isinstance(lending_balances, list):  # silly api wrapper, empty dict returns a list, which breaks the code later.
             lending_balances = {}
         lending_balances.update(get_on_order_balances())
 
