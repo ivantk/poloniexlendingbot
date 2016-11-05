@@ -285,12 +285,12 @@ def create_loan_offer(currency, amt, rate):
             days = '2'
         if config.has_option('BOT', 'endDate'):
             days_remaining = get_max_duration("order")
-            if days_remaining <= "2":
+            if int(days_remaining) <= 2:
                 print "endDate reached. Bot can no longer lend.\nExiting..."
                 log.log("endDate reached. Bot can no longer lend. Exiting.")
                 exit(0)
             if days > days_remaining:
-                days = days_remaining
+                days = str(days_remaining)
         if not dry_run:
             msg = bot.createLoanOffer(currency, amt, days, 0, rate)
             log.offer(amt, currency, rate, days, msg)
@@ -374,19 +374,19 @@ def get_on_order_balances():
 
 
 def get_max_duration(context):
-    if not config.get('BOT', 'endDate'):
+    if not config.has_option('BOT', 'endDate'):
         return ""
     try:
         now_time = datetime.date.today()
         config_date = map(int, config.get('BOT', 'endDate').split(','))
         end_time = datetime.date(*config_date)  # format YEAR,MONTH,DAY all ints, also used splat operator
         diff_days = (end_time - now_time).days
+        if context == "order":
+            return diff_days  # Order needs int
+        if context == "status":
+            return " - Days Remaining: " + str(diff_days)  # Status needs string
     except Exception as E:
         print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
-    if context == "order":
-        return diff_days
-    if context == "status":
-        return " - Days Remaining: " + diff_days
 
 
 def cancel_all():

@@ -77,7 +77,7 @@ class JsonOutput(object):
 class Logger(object):
     def __init__(self, json_file='', json_log_size=-1):
         self._lended = ''
-        self._daysRemaining = 'Not Set'
+        self._daysRemaining = ''
         if json_file != '' and json_log_size != -1:
             self.console = JsonOutput(json_file, json_log_size)
         else:
