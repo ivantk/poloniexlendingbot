@@ -288,6 +288,7 @@ def create_loan_offer(currency, amt, rate):
             if int(days_remaining) <= 2:
                 print "endDate reached. Bot can no longer lend.\nExiting..."
                 log.log("endDate reached. Bot can no longer lend. Exiting.")
+                log.refreshStatus(stringify_total_lended(), get_max_duration("status"))
                 exit(0)
             if days > days_remaining:
                 days = str(days_remaining)
