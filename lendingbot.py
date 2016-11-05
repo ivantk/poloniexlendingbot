@@ -284,14 +284,14 @@ def create_loan_offer(currency, amt, rate):
         if xday_threshold == 0:
             days = '2'
         if config.has_option('BOT', 'endDate'):
-            days_remaining = get_max_duration("order")
+            days_remaining = int(get_max_duration("order"))
             if int(days_remaining) <= 2:
                 print "endDate reached. Bot can no longer lend.\nExiting..."
                 log.log("The end date has almost been reached and the bot can no longer lend. Exiting.")
                 log.refreshStatus(stringify_total_lended(), get_max_duration("status"))
                 log.persistStatus()
                 exit(0)
-            if days > days_remaining:
+            if int(days) > days_remaining:
                 days = str(days_remaining)
         if not dry_run:
             msg = bot.createLoanOffer(currency, amt, days, 0, rate)
@@ -389,6 +389,7 @@ def get_max_duration(context):
             return " - Days Remaining: " + str(diff_days)  # Status needs string
     except Exception as E:
         print "ERROR: There is something wrong with your endDate option. Error: " + str(E)
+        exit(1)
 
 
 def cancel_all():
